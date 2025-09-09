@@ -1,0 +1,70 @@
+/* General Styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f6; margin: 0; padding: 20px; color: #333;
+}
+.hidden { display: none !important; }
+
+/* --- Login Overlay --- */
+#login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+#login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); width: 320px; text-align: center; }
+#login-box h2 { margin-top: 0; margin-bottom: 25px; color: #2c3e50; }
+.input-group { margin-bottom: 15px; text-align: left; }
+.input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
+.input-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+#login-button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+#login-button:hover { background-color: #2980b9; }
+#login-error { color: #e74c3c; margin-top: 15px; font-size: 14px; min-height: 20px; }
+
+/* --- App Header & Search --- */
+.app-header { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; padding: 0 20px; }
+.header-left { flex-grow: 1; }
+#search-bar { width: 50%; max-width: 400px; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; margin-left: 20px; }
+#logout-button { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background-color 0.3s; }
+#logout-button:hover { background-color: #c0392b; }
+
+/* --- Main Tabs --- */
+#main-tabs { display: flex; gap: 5px; max-width: 1600px; margin: 15px auto 0 auto; padding: 0 20px; border-bottom: 1px solid #ccc; }
+.main-tab-btn { background-color: #f0f0f0; border: 1px solid #ccc; border-bottom: none; padding: 10px 20px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 16px; font-weight: 500; color: #555; }
+.main-tab-btn.active { background-color: #fff; color: #3498db; border-bottom: 1px solid #fff; margin-bottom: -1px; }
+
+/* --- Main Layout --- */
+#main-content-wrapper { display: flex; gap: 20px; max-width: 1600px; margin: 10px auto 30px auto; }
+.panel { background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); padding: 20px; height: 75vh; min-height: 500px; overflow-y: auto; }
+#admin-tools-panel, #calculator-panel { flex: 0 0 280px; }
+.tool-section { background-color: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.tool-section h3 { margin-top: 0; color: #2c3e50; }
+.tool-section label { font-size: 14px; font-weight: 500; margin-bottom: 5px; display: block; }
+.tool-section select, .tool-section input, .tool-section textarea { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #bdc3c7; box-sizing: border-box; }
+.tool-section button { width: 100%; background-color: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+.feedback-text { font-size: 13px; margin-top: 10px; min-height: 16px; font-weight: bold; }
+.calc-result { font-size: 18px; font-weight: bold; color: #34495e; text-align: center; margin-top: 10px; }
+.container { flex-grow: 1; display: flex; }
+.left-panel { flex: 1; border-right: 1px solid #e0e0e0; padding-right: 15px; overflow-y: auto; }
+.category-header { background-color: #ecf0f1; color: #2c3e50; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: all 0.3s ease; font-size: 16px; font-weight: 500; }
+.category-header:hover { background-color: #dce4e6; }
+.category-header.active { background-color: #3498db; color: white; }
+.right-panel { flex: 2; display: flex; flex-direction: column; overflow: hidden; padding-left: 15px; }
+#tag-filter-ribbon { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #e0e0e0; margin-bottom: 15px; }
+.tag-filter-btn { background-color: #ecf0f1; color: #34495e; border: 1px solid transparent; border-radius: 15px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; }
+.tag-filter-btn:hover { background-color: #dce4e6; }
+.tag-filter-btn.active { background-color: #3498db; color: white; border-color: #2980b9; }
+#right-panel-content { overflow-y: auto; }
+#right-panel-content h2 { color: #7f8c8d; font-weight: 500; text-align: center; margin-top: 40px; }
+
+/* Template & PN Card Styles */
+.template-card, .pn-card { position: relative; background-color: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+.card-category-label { font-size: 11px; font-weight: 600; color: #7f8c8d; margin-bottom: 8px; text-transform: uppercase; }
+.admin-controls, .pn-controls { display: flex; gap: 10px; position: absolute; top: 10px; right: 10px; }
+.admin-btn, .pn-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: #7f8c8d; transition: color 0.2s; }
+.pn-btn.edit:hover, .admin-btn.edit:hover { color: #2980b9; }
+.pn-btn.delete:hover, .admin-btn.delete:hover { color: #c0392b; }
+.tags-container { margin-bottom: 12px; }
+.tag { display: inline-block; background-color: #e0e6e8; color: #34495e; padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: 600; margin: 0 6px 6px 0; }
+.template-text, .pn-content { background-color: #f8f9f9; border: 1px solid #eef2f3; border-radius: 6px; padding: 12px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+.template-text { cursor: pointer; }
+.pn-card h4 { margin: 0 0 10px 0; color: #2c3e50; }
+
+/* Copy Notification Popup */
+.copy-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; font-size: 14px; }
+.copy-notification.show { opacity: 1; visibility: visible; }

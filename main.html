@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIMOBot - Tools</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+  <div id="login-overlay">
+    <div id="login-box">
+        <h2>WIMOBot Login</h2>
+        <form id="login-form">
+            <div class="input-group"><label for="username">Username</label><input type="text" id="username" required></div>
+            <div class="input-group"><label for="password">Password</label><input type="password" id="password" required></div>
+            <div id="login-error"></div>
+            <button type="submit" id="login-button">Login</button>
+        </form>
+    </div>
+  </div>
+  
+  <div id="app-wrapper" class="hidden">
+    <div class="app-header">
+      <div class="header-left"><h1>WIMOBot Tools</h1></div>
+      <input type="search" id="search-bar" placeholder="Search templates or tags...">
+      <button id="logout-button">Logout</button>
+    </div>
+    
+    <div id="main-tabs">
+        <button id="templates-tab-btn" class="main-tab-btn active">Templates</button>
+        <button id="pns-tab-btn" class="main-tab-btn">PNs</button>
+    </div>
+
+    <div id="templates-view">
+        <div id="main-content-wrapper"></div>
+    </div>
+    <div id="pns-view" class="hidden"></div>
+
+  </div>
+
+  <div id="copy-notification" class="copy-notification">Copied to clipboard!</div>
+
+  <script src="main.js"></script>
+</body>
+</html>
