@@ -2,40 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- IMPORTANT SECURITY WARNING ---
     // This authentication is for demonstration only. It is NOT secure.
     // In a real application, user data and authentication logic MUST be handled on a server.
-    
-    // --- Initial Data (used only to seed sessionStorage) ---
-    const initialUsers = [
-        { username: 'admin', password: 'adminpassword', role: 'admin' },
-        { username: 'user', password: 'userpassword', role: 'user' }
-    ];
-    let categories = [
-      {
-        title: "Restaurant Delays",
-        templates: [
-          { tags: ["restaurant", "delay", "prep_issue", "dp_waiting"], text: "The order is delayed by the restaurant as the food is not prepared yet. However, the delivery partner is waiting at the restaurant for the order." },
-          { tags: ["restaurant", "delay", "resolved", "in_transit"], text: "The order was delayed by the restaurant. However, the delivery partner has just received the order, and is now on the way to deliver it to the customer's location." },
-        ]
-      },
-      {
-        title: "Delivery Partner Delays",
-        templates: [
-          { tags: ["dp_issue", "delay", "grouped_order"], text: "The order is delayed due to grouped orders. However, the delivery partner is on the way to deliver the order to the customer's location." },
-          { tags: ["system", "delay", "unassigned"], text: "The order is delayed as the delivery partner has not yet been assigned. Delivery partners are completing another order. The order will be delivered soon." }
-        ]
-      },
-      {
-        title: "General Order Status",
-        templates: [
-          { tags: ["status", "on_time", "unassigned"], text: "The order is on time. As per tracking, a delivery partner has not been assigned yet. The order will be delivered soon." }
-        ]
-      }
-    ];
-    let pnsData = [
-        { title: "Example PN Category", notes: [ { title: "Welcome Note", content: "This is your personal notes section!\nCreate categories and notes for your reference." } ] }
-    ];
 
     // --- Global State ---
-    let currentUser = null, activeCategoryIndex = 0, activePnCategoryIndex = 0, userData = [];
+    let currentUser = null, activeCategoryIndex = 0, activePnCategoryIndex = 0;
+    // Data will be populated from the server via WebSocket
+    let userData = [], categories = [], pnsData = []; 
     let allUniqueTags = [], selectedTags = new Set();
     
     // --- All DOM Getters Here For Readability ---
@@ -50,17 +21,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBar = document.getElementById('search-bar');
     const copyNotification = document.getElementById('copy-notification');
 
-    // --- Data & Session Management ---
-    function initializeUserData() {
-        if (sessionStorage.getItem('wimoBotUsers')) { userData = JSON.parse(sessionStorage.getItem('wimoBotUsers')); } 
-        else { userData = initialUsers; sessionStorage.setItem('wimoBotUsers', JSON.stringify(userData)); }
-        
-        if (sessionStorage.getItem('wimoBotCategories')) { categories = JSON.parse(sessionStorage.getItem('wimoBotCategories')); }
-        else { sessionStorage.setItem('wimoBotCategories', JSON.stringify(categories)); }
+    // --- WebSocket Connection ---
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}`);
 
-        if (sessionStorage.getItem('wimoBotPNs')) { pnsData = JSON.parse(sessionStorage.getItem('wimoBotPNs')); }
-        else { sessionStorage.setItem('wimoBotPNs', JSON.stringify(pnsData)); }
-    }
+    ws.onopen = () => {
+        console.log('Connected to WebSocket server.');
+    };
+
+    ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        const data = message.payload;
+
+        // Update local state with data from server
+        userData = data.users;
+        categories = data.categories;
+        pnsData = data.pnsData;
+
+        // After receiving any data, re-process tags and re-render the current view
+        processAllTags();
+        if (currentUser) { // Only re-render if user is logged in
+            if (!templatesView.classList.contains('hidden')) {
+                renderCategories();
+                renderTagFilterRibbon();
+                displayTemplates(activeCategoryIndex);
+            } else if (!pnsView.classList.contains('hidden')) {
+                // Clear the view to force a rebuild
+                pnsView.innerHTML = ''; 
+                buildPNsView();
+            }
+        }
+    };
+
+    ws.onclose = () => {
+        console.log('Disconnected from WebSocket server.');
+        alert('Connection to server lost. Please refresh the page to reconnect.');
+    };
 
     function checkSession() {
       const storedUser = sessionStorage.getItem('wimoBotCurrentUser');
@@ -68,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
           currentUser = JSON.parse(storedUser);
           loginOverlay.classList.add('hidden');
           appWrapper.classList.remove('hidden');
-          initializeApp();
+          // We wait for the first ws.onmessage to provide data before initializing
       }
     }
     
@@ -116,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesTabBtn.classList.add('active');
         pnsTabBtn.classList.remove('active');
         searchBar.classList.remove('hidden');
+        // Refresh the view in case data changed while on another tab
+        displayTemplates(activeCategoryIndex);
     }
 
     function showPNsView() {
@@ -124,10 +122,11 @@ document.addEventListener('DOMContentLoaded', function() {
         pnsTabBtn.classList.add('active');
         templatesTabBtn.classList.remove('active');
         searchBar.classList.add('hidden');
+        pnsView.innerHTML = ''; // Clear view to force rebuild with latest data
         buildPNsView();
     }
 
-    // --- TEMPLATES VIEW LOGIC ---
+    // --- TEMPLATES VIEW LOGIC --- (Functions from setupTemplatesLayout to displayTemplates remain mostly the same)
     function setupTemplatesLayout() {
         const mainContentWrapper = document.getElementById('main-content-wrapper') || document.createElement('div');
         if (!mainContentWrapper.id) {
@@ -145,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function renderCategories() {
       const leftPanel = document.querySelector('#templates-view .left-panel');
+      if (!leftPanel) return;
       leftPanel.innerHTML = '';
       const allCatHeader = document.createElement('div');
       allCatHeader.className = 'category-header';
@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function displayTemplates(categoryIndex) {
       const rightPanelContent = document.getElementById('right-panel-content');
+      if (!rightPanelContent) return;
       rightPanelContent.innerHTML = '';
       const searchKeywords = searchBar.value.toLowerCase().split(' ').filter(Boolean);
       let templatesToDisplay = [];
@@ -225,9 +226,11 @@ document.addEventListener('DOMContentLoaded', function() {
         rightPanelContent.appendChild(card);
       });
     };
-
+    
+    // --- MODIFIED DATA-MUTATING FUNCTIONS ---
     function createAdminTools() {
       const panel = document.getElementById('admin-tools-panel');
+      if (!panel) return;
       const addForm = document.createElement('form'); addForm.className = 'tool-section';
       let categoryOptions = categories.map((cat, index) => `<option value="${index}">${cat.title}</option>`).join('');
       addForm.innerHTML = `<h3>Add New Template</h3><label for="category-select">Category:</label><select id="category-select">${categoryOptions}<option value="--new--">Create New Category...</option></select><input type="text" id="new-category-name" placeholder="New category name..." class="hidden"><label for="new-template-text">Template Text:</label><textarea id="new-template-text" required></textarea><label for="new-template-tags">Tags (comma-separated):</label><input type="text" id="new-template-tags" required><button type="submit">Add Template</button>`;
@@ -241,17 +244,17 @@ document.addEventListener('DOMContentLoaded', function() {
               const newCategoryName = document.getElementById('new-category-name').value.trim();
               if (!newCategoryName) { alert('New category name cannot be empty.'); return; }
               categories.push({ title: newCategoryName, templates: [newTemplate] });
-              targetCategoryIndex = categories.length - 1;
-          } else { categories[targetCategoryIndex].templates.push(newTemplate); }
-          sessionStorage.setItem('wimoBotCategories', JSON.stringify(categories));
-          activeCategoryIndex = parseInt(targetCategoryIndex);
-          processAllTags(); renderCategories(); renderTagFilterRibbon();
-          document.querySelectorAll('.category-header')[activeCategoryIndex + 1]?.click();
+              activeCategoryIndex = categories.length - 1;
+          } else { 
+              categories[targetCategoryIndex].templates.push(newTemplate); 
+              activeCategoryIndex = parseInt(targetCategoryIndex);
+          }
+          ws.send(JSON.stringify({ type: 'update-categories', payload: categories }));
           addForm.reset(); document.getElementById('new-category-name').classList.add('hidden');
       });
-      const passwordForm = document.createElement('form'); /* ... same as before ... */
+      const passwordForm = document.createElement('form');
       let userOptions = userData.map(u => `<option value="${u.username}">${u.username}</option>`).join('');
-      passwordForm.innerHTML = `<h3>Change Password</h3> <label for="user-select">User:</label> <select id="user-select">${userOptions}</select> <label for="new-password">New Password:</label> <input type="text" id="new-password" required> <button type="submit">Update Password</button> <div class="feedback-text success" id="password-change-feedback"></div>`;
+      passwordForm.innerHTML = `<h3>Change Password</h3> <label for="user-select">User:</label> <select id="user-select">${userOptions}</select> <label for="new-password">New Password:</label> <input type="password" id="new-password" required> <button type="submit">Update Password</button> <div class="feedback-text success" id="password-change-feedback"></div>`;
       passwordForm.addEventListener('submit', (e) => {
           e.preventDefault();
           const usernameToChange = document.getElementById('user-select').value;
@@ -259,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const userToUpdate = userData.find(u => u.username === usernameToChange);
           if(userToUpdate) {
               userToUpdate.password = newPassword;
-              sessionStorage.setItem('wimoBotUsers', JSON.stringify(userData));
+              ws.send(JSON.stringify({ type: 'update-users', payload: userData }));
               const feedback = document.getElementById('password-change-feedback');
               feedback.textContent = `Password for ${usernameToChange} updated!`;
               setTimeout(() => feedback.textContent = '', 3000);
@@ -269,15 +272,37 @@ document.addEventListener('DOMContentLoaded', function() {
       panel.appendChild(addForm); panel.appendChild(passwordForm);
     };
 
-    // --- PNs VIEW LOGIC ---
+    function editTemplate(catIndex, tplIndex) {
+        const tpl = categories[catIndex].templates[tplIndex];
+        const newText = prompt('Edit the template text:', tpl.text);
+        if (newText && newText.trim()) {
+            tpl.text = newText;
+            const newTagsRaw = prompt('Edit tags (comma-separated):', tpl.tags.join(', '));
+            if (newTagsRaw !== null) { 
+                tpl.tags = newTagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+                ws.send(JSON.stringify({ type: 'update-categories', payload: categories }));
+            }
+        }
+    };
+
+    function deleteTemplate(catIndex, tplIndex) {
+        if (confirm('Are you sure you want to delete this template?')) {
+            categories[catIndex].templates.splice(tplIndex, 1);
+            ws.send(JSON.stringify({ type: 'update-categories', payload: categories }));
+        }
+    };
+
+    // --- PNs VIEW LOGIC --- (Functions updated to send data to server)
     function buildPNsView() {
-        if (pnsView.innerHTML !== '') return;
+        if (!pnsView) return;
         pnsView.innerHTML = `<div class="panel container"><div class="left-panel" id="pns-category-panel"></div><div class="right-panel" id="pns-content-panel"></div></div>`;
         renderPNCategories();
         if (pnsData.length > 0) { displayPNs(activePnCategoryIndex); }
     };
+
     function renderPNCategories() {
         const panel = document.getElementById('pns-category-panel');
+        if (!panel) return;
         panel.innerHTML = '';
         pnsData.forEach((cat, index) => {
             const header = document.createElement('div');
@@ -294,21 +319,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const name = prompt('Enter new category name:');
             if (name && name.trim()) {
                 pnsData.push({ title: name.trim(), notes: [] });
-                sessionStorage.setItem('wimoBotPNs', JSON.stringify(pnsData));
-                renderPNCategories();
+                ws.send(JSON.stringify({ type: 'update-pns', payload: pnsData }));
             }
         });
         panel.appendChild(addCatBtn);
     };
+
     function displayPNs(pnCatIndex) {
         const panel = document.getElementById('pns-content-panel');
+        if (!panel) return;
         panel.innerHTML = '';
         const category = pnsData[pnCatIndex];
         if (!category) { panel.innerHTML = '<h2>Select or create a category.</h2>'; return; }
         
         category.notes.forEach((note, noteIndex) => {
             const card = document.createElement('div'); card.className = 'pn-card';
-            card.innerHTML = `<h4>${note.title}</h4><div class="pn-content">${note.content}</div>`;
+            card.innerHTML = `<h4>${note.title}</h4><div class="pn-content">${note.content.replace(/\n/g, '<br>')}</div>`; // Render newlines
             const controls = document.createElement('div'); controls.className = 'pn-controls';
             const editBtn = document.createElement('button'); editBtn.innerHTML = '&#9998;'; editBtn.className = 'pn-btn edit';
             editBtn.onclick = () => {
@@ -316,16 +342,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newContent = prompt('Edit note content:', note.content);
                 if (newTitle !== null && newContent !== null) {
                     pnsData[pnCatIndex].notes[noteIndex] = { title: newTitle, content: newContent };
-                    sessionStorage.setItem('wimoBotPNs', JSON.stringify(pnsData));
-                    displayPNs(pnCatIndex);
+                    ws.send(JSON.stringify({ type: 'update-pns', payload: pnsData }));
                 }
             };
             const deleteBtn = document.createElement('button'); deleteBtn.innerHTML = '&#128465;'; deleteBtn.className = 'pn-btn delete';
             deleteBtn.onclick = () => {
                 if (confirm('Delete this note?')) {
                     pnsData[pnCatIndex].notes.splice(noteIndex, 1);
-                    sessionStorage.setItem('wimoBotPNs', JSON.stringify(pnsData));
-                    displayPNs(pnCatIndex);
+                    ws.send(JSON.stringify({ type: 'update-pns', payload: pnsData }));
                 }
             };
             controls.appendChild(editBtn); controls.appendChild(deleteBtn);
@@ -341,14 +365,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const content = document.getElementById('new-pn-content').value;
             if (title && content) {
                 pnsData[pnCatIndex].notes.push({ title, content });
-                sessionStorage.setItem('wimoBotPNs', JSON.stringify(pnsData));
-                displayPNs(pnCatIndex);
+                ws.send(JSON.stringify({ type: 'update-pns', payload: pnsData }));
             }
         });
         panel.appendChild(addNoteForm);
     };
     
-    // --- Helper Functions and Other CRUD ---
+    // --- Helper Functions and Other CRUD --- (Calculator functions remain the same)
     function createCalculatorTools() {
       const panel = document.getElementById('calculator-panel'); if (!panel) return;
       const percentOfForm = document.createElement('form'); percentOfForm.className = 'tool-section';
@@ -359,35 +382,13 @@ document.addEventListener('DOMContentLoaded', function() {
       fractionForm.addEventListener('submit', (e) => { e.preventDefault(); const expression = document.getElementById('fraction-input').value; const resultEl = document.getElementById('fraction-result'); if (expression.includes('/')) { const parts = expression.split('/'); const numerator = parseFloat(parts[0]); const denominator = parseFloat(parts[1]); if (parts.length === 2 && !isNaN(numerator) && !isNaN(denominator)) { if (denominator === 0) { resultEl.textContent = "Cannot divide by zero"; } else { const result = (numerator / denominator) * 100; resultEl.textContent = `${result.toFixed(2)}%`; } } else { resultEl.textContent = "Invalid fraction"; } } else { resultEl.textContent = "Use format: number/number"; } });
       panel.appendChild(percentOfForm); panel.appendChild(fractionForm);
     };
-    function editTemplate(catIndex, tplIndex) {
-        const tpl = categories[catIndex].templates[tplIndex];
-        const newText = prompt('Edit the template text:', tpl.text);
-        if (newText && newText.trim()) {
-            tpl.text = newText;
-            const newTagsRaw = prompt('Edit tags (comma-separated):', tpl.tags.join(', '));
-            if (newTagsRaw !== null) { 
-                tpl.tags = newTagsRaw.split(',').map(t => t.trim()).filter(Boolean);
-                sessionStorage.setItem('wimoBotCategories', JSON.stringify(categories));
-                processAllTags(); renderTagFilterRibbon();
-            }
-            displayTemplates(activeCategoryIndex);
-        }
-    };
-    function deleteTemplate(catIndex, tplIndex) {
-        if (confirm('Are you sure you want to delete this template?')) {
-            categories[catIndex].templates.splice(tplIndex, 1);
-            sessionStorage.setItem('wimoBotCategories', JSON.stringify(categories));
-            displayTemplates(activeCategoryIndex);
-        }
-    };
+
     function showCopyNotification() {
       copyNotification.classList.add('show');
       setTimeout(() => copyNotification.classList.remove('show'), 2000);
     };
     
     // --- Initial Setup ---
-    initializeUserData();
-    processAllTags();
     loginForm.addEventListener('submit', handleLogin);
     checkSession();
 });
