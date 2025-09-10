@@ -84,9 +84,9 @@ button { cursor: pointer; }
 .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); border-color: var(--primary-color); }
 .modal-btn.primary:hover { background-color: var(--primary-hover); }
 
-/* --- Toast Notifications --- */
-#toast-container { position: fixed; bottom: 80px; right: 20px; z-index: 4000; }
-.toast { background-color: var(--dark-color); color: var(--white-color); padding: 15px 20px; border-radius: var(--border-radius); margin-bottom: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; }
+/* --- Toast Notifications (Moved to Top-Right) --- */
+#toast-container { position: fixed; top: 80px; right: 20px; z-index: 4000; }
+.toast { background-color: var(--dark-color); color: var(--white-color); padding: 15px 20px; border-radius: var(--border-radius); margin-bottom: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); opacity: 0; transform: translateY(-20px); transition: all 0.3s ease; }
 .toast.success { background-color: var(--success-color); }
 .toast.error { background-color: var(--danger-color); }
 .toast.show { opacity: 1; transform: translateY(0); }

@@ -224,10 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 controls.append(editBtn, deleteBtn);
                 card.appendChild(controls);
             }
-            // --- CLICK TO COPY LOGIC (Templates) ---
             card.querySelector('.template-text').addEventListener('click', () => {
                 navigator.clipboard.writeText(tpl.text);
-                showToast('Copied to clipboard!');
+                showToast('Text Copied !'); // <-- UPDATED TEXT
             });
             content.appendChild(card);
         });
@@ -325,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
         content.innerHTML = '';
         activeCategory.notes.forEach(note => {
             const card = document.createElement('div');
-            card.className = 'template-card'; // Re-use template card style
+            card.className = 'template-card';
             card.innerHTML = `<h4>${note.title}</h4><div class="template-text">${note.content.replace(/\n/g, '<br>')}</div>`;
             const controls = document.createElement('div');
             controls.className = 'card-controls';
@@ -337,10 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteBtn.onclick = () => handleDeletePNNote(note);
             controls.append(editBtn, deleteBtn);
             card.appendChild(controls);
-            // --- CLICK TO COPY LOGIC (PNs) ---
             card.querySelector('.template-text').addEventListener('click', () => {
                 navigator.clipboard.writeText(note.content);
-                showToast('Note content copied!');
+                showToast('Text Copied !'); // <-- UPDATED TEXT
             });
             content.appendChild(card);
         });
