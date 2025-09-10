@@ -21,42 +21,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBar = document.getElementById('search-bar');
     const copyNotification = document.getElementById('copy-notification');
 
-    // --- WebSocket Connection ---
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}`);
+    // --- WebSocket Connection with Reconnect Logic ---
+    let ws; // Define ws variable in a broader scope
 
-    ws.onopen = () => {
-        console.log('Connected to WebSocket server.');
-    };
+    function connect() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        ws = new WebSocket(`${protocol}//${window.location.host}`);
 
-    ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        const data = message.payload;
+        ws.onopen = () => {
+            console.log('Connected to WebSocket server.');
+            // Optional: Hide any "reconnecting" message you might show
+        };
 
-        // Update local state with data from server
-        userData = data.users;
-        categories = data.categories;
-        pnsData = data.pnsData;
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            const data = message.payload;
 
-        // After receiving any data, re-process tags and re-render the current view
-        processAllTags();
-        if (currentUser) { // Only re-render if user is logged in
-            if (!templatesView.classList.contains('hidden')) {
-                renderCategories();
-                renderTagFilterRibbon();
-                displayTemplates(activeCategoryIndex);
-            } else if (!pnsView.classList.contains('hidden')) {
-                // Clear the view to force a rebuild
-                pnsView.innerHTML = ''; 
-                buildPNsView();
+            // Update local state with data from server
+            userData = data.users;
+            categories = data.categories;
+            pnsData = data.pnsData;
+
+            // After receiving any data, re-process tags and re-render the current view
+            processAllTags();
+            if (currentUser) { // Only re-render if user is logged in
+                if (!templatesView.classList.contains('hidden')) {
+                    renderCategories();
+                    renderTagFilterRibbon();
+                    displayTemplates(activeCategoryIndex);
+                } else if (!pnsView.classList.contains('hidden')) {
+                    // Clear the view to force a rebuild
+                    pnsView.innerHTML = ''; 
+                    buildPNsView();
+                }
             }
-        }
-    };
+        };
 
-    ws.onclose = () => {
-        console.log('Disconnected from WebSocket server.');
-        alert('Connection to server lost. Please refresh the page to reconnect.');
-    };
+        ws.onclose = () => {
+            console.log('Disconnected from WebSocket server. Attempting to reconnect in 5 seconds...');
+            // Optional: Show a "reconnecting..." message to the user
+            setTimeout(connect, 5000); // Try to reconnect after 5 seconds
+        };
+
+        ws.onerror = (err) => {
+            console.error('WebSocket error:', err);
+            ws.close(); // This will trigger the onclose event handler for reconnection
+        };
+    }
+    
+    connect(); // Initial connection call
 
     function checkSession() {
       const storedUser = sessionStorage.getItem('wimoBotCurrentUser');
