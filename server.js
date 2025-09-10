@@ -3,7 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
-require('dotenv').config(); 
+require('dotenv').config();
 
 // --- Environment & Database Configuration ---
 const mongoUri = process.env.MONGO_URI; 
@@ -79,7 +79,7 @@ wss.on('connection', (ws) => {
 
             // --- CRUD Operations ---
             switch (type) {
-                // Categories
+                // Template Categories
                 case 'create-category':
                     if (isAdmin) await categoriesCollection.insertOne({ title: payload.title, templates: [] });
                     break;
@@ -115,7 +115,30 @@ wss.on('connection', (ws) => {
                     if (isAdmin) await usersCollection.deleteOne({ _id: new ObjectId(payload.userId) });
                     break;
                 
-                // Add PN Categories and PN Notes CRUD here if needed, following the same pattern
+                // --- PN Categories ---
+                case 'create-pn-category':
+                    await pnCategoriesCollection.insertOne({ title: payload.title, notes: [] });
+                    break;
+                case 'update-pn-category':
+                    await pnCategoriesCollection.updateOne({ _id: new ObjectId(payload.categoryId) }, { $set: { title: payload.title } });
+                    break;
+                case 'delete-pn-category':
+                    await pnCategoriesCollection.deleteOne({ _id: new ObjectId(payload.categoryId) });
+                    break;
+
+                // --- PN Notes ---
+                case 'create-pn-note':
+                    await pnCategoriesCollection.updateOne({ _id: new ObjectId(payload.categoryId) }, { $push: { notes: { ...payload.note, _id: new ObjectId() } } });
+                    break;
+                case 'update-pn-note':
+                    await pnCategoriesCollection.updateOne(
+                        { _id: new ObjectId(payload.categoryId), "notes._id": new ObjectId(payload.note._id) },
+                        { $set: { "notes.$": payload.note } }
+                    );
+                    break;
+                case 'delete-pn-note':
+                    await pnCategoriesCollection.updateOne({ _id: new ObjectId(payload.categoryId) }, { $pull: { notes: { _id: new ObjectId(payload.noteId) } } });
+                    break;
             }
             
             // After any change, broadcast the fresh state to all clients
