@@ -8,7 +8,9 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const PORT = 3000;
+// This uses the port provided by the hosting service (like Render),
+// or defaults to 3000 for local development.
+const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
 // Serve static files (HTML, CSS, client-side JS) from the current directory
@@ -20,7 +22,9 @@ const readData = () => {
   return JSON.parse(rawData);
 };
 
-// Function to write data to the JSON file
+// --- THIS IS THE FUNCTION THAT SAVES THE DATA ---
+// It takes a JavaScript object and writes it to the data.json file,
+// overwriting the previous content.
 const writeData = (data) => {
   // Use null, 2 for pretty-printing the JSON
   fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
@@ -61,7 +65,9 @@ wss.on('connection', (ws) => {
         data.users = parsedMessage.payload;
       }
        
-      // Save the updated data back to the file
+      // --- THIS IS THE LINE THAT EXECUTES THE SAVE ---
+      // After the data object is updated in memory, this line calls the
+      // writeData function to make the changes permanent in the data.json file.
       writeData(data);
 
       // Broadcast the complete, updated data to ALL connected clients
