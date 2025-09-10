@@ -22,16 +22,11 @@
   
   <div id="app-wrapper" class="hidden">
     <header class="app-header">
-      <div class="header-left">
-        <h1>WIMOBot Tools</h1>
-      </div>
-      <div class="header-center">
-        <input type="search" id="search-bar" placeholder="Search templates or tags...">
-      </div>
+      <div class="header-left"><h1>WIMOBot Tools</h1></div>
+      <div class="header-center"><input type="search" id="search-bar" placeholder="Search templates or tags..."></div>
       <div class="header-right">
         <div id="user-info">
-            <span id="user-role-display"></span>
-            <span class="user-icon">&#128100;</span>
+            <span id="user-role-display"></span><span class="user-icon">&#128100;</span>
         </div>
         <button id="logout-button">Logout</button>
       </div>
@@ -40,20 +35,31 @@
     <div id="main-tabs">
         <button id="templates-tab-btn" class="main-tab-btn active">Templates</button>
         <button id="pns-tab-btn" class="main-tab-btn">PNs</button>
+        <button id="admin-tab-btn" class="main-tab-btn hidden">Admin</button>
     </div>
 
-    <div id="templates-view">
-        <div id="main-content-wrapper"></div>
-    </div>
+    <div id="templates-view"></div>
     <div id="pns-view" class="hidden"></div>
+    <div id="admin-view" class="hidden"></div>
   </div>
 
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box">
+        <h2 id="modal-title">Modal Title</h2>
+        <div id="modal-content"></div>
+        <div id="modal-actions">
+            <button id="modal-cancel-btn" class="modal-btn">Cancel</button>
+            <button id="modal-save-btn" class="modal-btn primary">Save</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  
   <footer class="app-footer">
     <div class="footer-text">Aditya Tech. & Devoops. &copy; 2025</div>
     <a href="https://adityatechndevoops.web.app/" target="_blank" class="footer-button">Visit Us</a>
   </footer>
-
-  <div id="copy-notification" class="copy-notification">Copied to clipboard!</div>
 
   <script src="main.js"></script>
 </body>
