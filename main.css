@@ -2,6 +2,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: #f4f7f6; margin: 0; padding: 20px; color: #333;
+  padding-bottom: 80px; /* Add padding to prevent footer from overlapping content */
 }
 .hidden { display: none !important; }
 
@@ -16,10 +17,15 @@ body {
 #login-button:hover { background-color: #2980b9; }
 #login-error { color: #e74c3c; margin-top: 15px; font-size: 14px; min-height: 20px; }
 
-/* --- App Header & Search --- */
+/* --- App Header & New Nav-Bar --- */
 .app-header { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; padding: 0 20px; }
-.header-left { flex-grow: 1; }
-#search-bar { width: 50%; max-width: 400px; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; margin-left: 20px; }
+.header-left h1 { font-size: 24px; color: #2c3e50; }
+.header-center { flex-grow: 1; text-align: center; }
+#search-bar { width: 100%; max-width: 500px; padding: 8px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 14px; }
+.header-right { display: flex; align-items: center; gap: 15px; }
+#user-info { display: flex; align-items: center; gap: 8px; background-color: #ecf0f1; padding: 5px 10px; border-radius: 15px; font-weight: 500; }
+#user-role-display { text-transform: capitalize; }
+.user-icon { font-size: 20px; }
 #logout-button { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background-color 0.3s; }
 #logout-button:hover { background-color: #c0392b; }
 
@@ -41,14 +47,21 @@ body {
 .calc-result { font-size: 18px; font-weight: bold; color: #34495e; text-align: center; margin-top: 10px; }
 .container { flex-grow: 1; display: flex; }
 .left-panel { flex: 1; border-right: 1px solid #e0e0e0; padding-right: 15px; overflow-y: auto; }
-.category-header { background-color: #ecf0f1; color: #2c3e50; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: all 0.3s ease; font-size: 16px; font-weight: 500; }
+.category-header { position: relative; display: flex; justify-content: space-between; align-items: center; background-color: #ecf0f1; color: #2c3e50; padding: 15px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: all 0.3s ease; font-size: 16px; font-weight: 500; }
 .category-header:hover { background-color: #dce4e6; }
 .category-header.active { background-color: #3498db; color: white; }
+.delete-category-btn { background: none; border: none; font-size: 16px; cursor: pointer; color: #95a5a6; }
+.category-header:hover .delete-category-btn { color: #34495e; }
+.category-header.active .delete-category-btn { color: white; }
+.delete-category-btn:hover { color: #e74c3c !important; }
 .right-panel { flex: 2; display: flex; flex-direction: column; overflow: hidden; padding-left: 15px; }
-#tag-filter-ribbon { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #e0e0e0; margin-bottom: 15px; }
+#tag-filter-ribbon { padding-bottom: 15px; flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #e0e0e0; margin-bottom: 15px; align-items: center; }
 .tag-filter-btn { background-color: #ecf0f1; color: #34495e; border: 1px solid transparent; border-radius: 15px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; }
 .tag-filter-btn:hover { background-color: #dce4e6; }
 .tag-filter-btn.active { background-color: #3498db; color: white; border-color: #2980b9; }
+/* --- New Style for Clear Filters Button --- */
+.clear-filters-btn { background-color: #c0392b; color: white; border: none; border-radius: 15px; padding: 5px 12px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; margin-left: 10px; }
+.clear-filters-btn:hover { background-color: #e74c3c; }
 #right-panel-content { overflow-y: auto; }
 #right-panel-content h2 { color: #7f8c8d; font-weight: 500; text-align: center; margin-top: 40px; }
 
@@ -68,3 +81,9 @@ body {
 /* Copy Notification Popup */
 .copy-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #2ecc71; color: white; padding: 10px 20px; border-radius: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; font-size: 14px; }
 .copy-notification.show { opacity: 1; visibility: visible; }
+
+/* --- Footer --- */
+.app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #34495e; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 1500; }
+.footer-text { font-size: 14px; }
+.footer-button { background-color: #3498db; color: white; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 14px; transition: background-color 0.3s; }
+.footer-button:hover { background-color: #2980b9; }

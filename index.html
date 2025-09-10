@@ -21,11 +21,21 @@
   </div>
   
   <div id="app-wrapper" class="hidden">
-    <div class="app-header">
-      <div class="header-left"><h1>WIMOBot Tools</h1></div>
-      <input type="search" id="search-bar" placeholder="Search templates or tags...">
-      <button id="logout-button">Logout</button>
-    </div>
+    <header class="app-header">
+      <div class="header-left">
+        <h1>WIMOBot Tools</h1>
+      </div>
+      <div class="header-center">
+        <input type="search" id="search-bar" placeholder="Search templates or tags...">
+      </div>
+      <div class="header-right">
+        <div id="user-info">
+            <span id="user-role-display"></span>
+            <span class="user-icon">&#128100;</span>
+        </div>
+        <button id="logout-button">Logout</button>
+      </div>
+    </header>
     
     <div id="main-tabs">
         <button id="templates-tab-btn" class="main-tab-btn active">Templates</button>
@@ -36,8 +46,12 @@
         <div id="main-content-wrapper"></div>
     </div>
     <div id="pns-view" class="hidden"></div>
-
   </div>
+
+  <footer class="app-footer">
+    <div class="footer-text">Aditya Tech. & Devoops. &copy; 2025</div>
+    <a href="https://adityatechndevoops.web.app/" target="_blank" class="footer-button">Visit Us</a>
+  </footer>
 
   <div id="copy-notification" class="copy-notification">Copied to clipboard!</div>
 

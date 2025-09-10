@@ -20,9 +20,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutButton = document.getElementById('logout-button');
     const searchBar = document.getElementById('search-bar');
     const copyNotification = document.getElementById('copy-notification');
+    const userRoleDisplay = document.getElementById('user-role-display');
 
     // --- WebSocket Connection with Reconnect Logic ---
-    let ws; // Define ws variable in a broader scope
+    let ws; 
 
     function connect() {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -30,27 +31,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         ws.onopen = () => {
             console.log('Connected to WebSocket server.');
-            // Optional: Hide any "reconnecting" message you might show
         };
 
         ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
             const data = message.payload;
 
-            // Update local state with data from server
             userData = data.users;
             categories = data.categories;
             pnsData = data.pnsData;
 
-            // After receiving any data, re-process tags and re-render the current view
             processAllTags();
-            if (currentUser) { // Only re-render if user is logged in
+            if (currentUser) {
                 if (!templatesView.classList.contains('hidden')) {
                     renderCategories();
                     renderTagFilterRibbon();
                     displayTemplates(activeCategoryIndex);
                 } else if (!pnsView.classList.contains('hidden')) {
-                    // Clear the view to force a rebuild
                     pnsView.innerHTML = ''; 
                     buildPNsView();
                 }
@@ -58,26 +55,32 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         ws.onclose = () => {
-            console.log('Disconnected from WebSocket server. Attempting to reconnect in 5 seconds...');
-            // Optional: Show a "reconnecting..." message to the user
-            setTimeout(connect, 5000); // Try to reconnect after 5 seconds
+            console.log('Disconnected. Reconnecting in 5 seconds...');
+            setTimeout(connect, 5000);
         };
 
         ws.onerror = (err) => {
             console.error('WebSocket error:', err);
-            ws.close(); // This will trigger the onclose event handler for reconnection
+            ws.close();
         };
     }
     
-    connect(); // Initial connection call
+    connect();
+
+    // --- Helper function to update user info in Nav-Bar ---
+    function updateUserInfo() {
+        if (currentUser) {
+            userRoleDisplay.textContent = currentUser.role;
+        }
+    }
 
     function checkSession() {
       const storedUser = sessionStorage.getItem('wimoBotCurrentUser');
       if (storedUser) {
           currentUser = JSON.parse(storedUser);
+          updateUserInfo(); // <-- Update nav-bar on session load
           loginOverlay.classList.add('hidden');
           appWrapper.classList.remove('hidden');
-          // We wait for the first ws.onmessage to provide data before initializing
       }
     }
     
@@ -87,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
         allUniqueTags = [...tagSet].sort();
     }
 
-    // --- Authentication ---
     function handleLogin(e) {
       e.preventDefault();
       const username = document.getElementById('username').value;
@@ -95,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const foundUser = userData.find(u => u.username === username && u.password === password);
       if (foundUser) {
         currentUser = foundUser;
+        updateUserInfo(); // <-- Update nav-bar on login
         sessionStorage.setItem('wimoBotCurrentUser', JSON.stringify(currentUser));
         loginOverlay.classList.add('hidden');
         appWrapper.classList.remove('hidden');
@@ -105,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function handleLogout() { sessionStorage.removeItem('wimoBotCurrentUser'); location.reload(); }
 
-    // --- Main App Initialization & Tab Control ---
     function initializeApp() {
       setupTemplatesLayout();
       renderCategories();
@@ -116,7 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
       templatesTabBtn.addEventListener('click', showTemplatesView);
       pnsTabBtn.addEventListener('click', showPNsView);
 
-      if (categories.length > 0) { document.querySelector('.category-header[data-index="0"]')?.click(); }
+      if (categories.length > 0) {
+        activeCategoryIndex = 0;
+        document.querySelector('.category-header[data-index="0"]')?.classList.add('active');
+        displayTemplates(0);
+      }
     }
 
     function showTemplatesView() {
@@ -124,8 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pnsView.classList.add('hidden');
         templatesTabBtn.classList.add('active');
         pnsTabBtn.classList.remove('active');
-        searchBar.classList.remove('hidden');
-        // Refresh the view in case data changed while on another tab
+        searchBar.style.visibility = 'visible';
         displayTemplates(activeCategoryIndex);
     }
 
@@ -134,12 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
         templatesView.classList.add('hidden');
         pnsTabBtn.classList.add('active');
         templatesTabBtn.classList.remove('active');
-        searchBar.classList.add('hidden');
-        pnsView.innerHTML = ''; // Clear view to force rebuild with latest data
+        searchBar.style.visibility = 'hidden';
+        pnsView.innerHTML = '';
         buildPNsView();
     }
 
-    // --- TEMPLATES VIEW LOGIC --- (Functions from setupTemplatesLayout to displayTemplates remain mostly the same)
     function setupTemplatesLayout() {
         const mainContentWrapper = document.getElementById('main-content-wrapper') || document.createElement('div');
         if (!mainContentWrapper.id) {
@@ -174,18 +178,39 @@ document.addEventListener('DOMContentLoaded', function() {
       categories.forEach((category, index) => {
         const header = document.createElement('div');
         header.className = 'category-header';
-        header.textContent = category.title;
         header.dataset.index = index;
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = category.title;
+        header.appendChild(titleSpan);
+
+        if (currentUser.role === 'admin') {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-category-btn';
+            deleteBtn.innerHTML = '&#128465;';
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm(`Are you sure you want to delete the entire "${category.title}" category?`)) {
+                    categories.splice(index, 1);
+                    ws.send(JSON.stringify({ type: 'update-categories', payload: categories }));
+                    activeCategoryIndex = -1;
+                }
+            };
+            header.appendChild(deleteBtn);
+        }
+
         header.addEventListener('click', () => {
           activeCategoryIndex = index;
           renderCategories();
           displayTemplates(index);
         });
+
         if (index === activeCategoryIndex) { header.classList.add('active'); }
         leftPanel.appendChild(header);
       });
     };
 
+    // --- MODIFIED to include Clear Filters button ---
     function renderTagFilterRibbon() {
       const ribbon = document.getElementById('tag-filter-ribbon'); if (!ribbon) return;
       ribbon.innerHTML = '';
@@ -200,6 +225,21 @@ document.addEventListener('DOMContentLoaded', function() {
           });
           ribbon.appendChild(btn);
       });
+
+      // Add the "Clear Filters" button only if a filter is active
+      if (selectedTags.size > 0 || activeCategoryIndex !== -1) {
+          const clearBtn = document.createElement('button');
+          clearBtn.className = 'clear-filters-btn';
+          clearBtn.textContent = 'Clear Filters';
+          clearBtn.onclick = () => {
+              activeCategoryIndex = -1;
+              selectedTags.clear();
+              renderCategories();
+              renderTagFilterRibbon();
+              displayTemplates(-1);
+          };
+          ribbon.appendChild(clearBtn);
+      }
     };
     
     function displayTemplates(categoryIndex) {
@@ -240,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     };
     
-    // --- MODIFIED DATA-MUTATING FUNCTIONS ---
     function createAdminTools() {
       const panel = document.getElementById('admin-tools-panel');
       if (!panel) return;
@@ -305,7 +344,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // --- PNs VIEW LOGIC --- (Functions updated to send data to server)
     function buildPNsView() {
         if (!pnsView) return;
         pnsView.innerHTML = `<div class="panel container"><div class="left-panel" id="pns-category-panel"></div><div class="right-panel" id="pns-content-panel"></div></div>`;
@@ -347,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         category.notes.forEach((note, noteIndex) => {
             const card = document.createElement('div'); card.className = 'pn-card';
-            card.innerHTML = `<h4>${note.title}</h4><div class="pn-content">${note.content.replace(/\n/g, '<br>')}</div>`; // Render newlines
+            card.innerHTML = `<h4>${note.title}</h4><div class="pn-content">${note.content.replace(/\n/g, '<br>')}</div>`;
             const controls = document.createElement('div'); controls.className = 'pn-controls';
             const editBtn = document.createElement('button'); editBtn.innerHTML = '&#9998;'; editBtn.className = 'pn-btn edit';
             editBtn.onclick = () => {
@@ -379,12 +417,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (title && content) {
                 pnsData[pnCatIndex].notes.push({ title, content });
                 ws.send(JSON.stringify({ type: 'update-pns', payload: pnsData }));
+                addNoteForm.reset();
             }
         });
         panel.appendChild(addNoteForm);
     };
     
-    // --- Helper Functions and Other CRUD --- (Calculator functions remain the same)
     function createCalculatorTools() {
       const panel = document.getElementById('calculator-panel'); if (!panel) return;
       const percentOfForm = document.createElement('form'); percentOfForm.className = 'tool-section';
@@ -401,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => copyNotification.classList.remove('show'), 2000);
     };
     
-    // --- Initial Setup ---
     loginForm.addEventListener('submit', handleLogin);
     checkSession();
 });
