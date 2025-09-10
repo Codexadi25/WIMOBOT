@@ -10,13 +10,28 @@
 
   <div id="login-overlay">
     <div id="login-box">
-        <h2>WIMOBot Login</h2>
-        <form id="login-form">
-            <div class="input-group"><label for="username">Username</label><input type="text" id="username" required></div>
-            <div class="input-group"><label for="password">Password</label><input type="password" id="password" required></div>
-            <div id="login-error"></div>
-            <button type="submit" id="login-button">Login</button>
-        </form>
+        <div id="login-form-container">
+            <h2>WIMOBot Login</h2>
+            <form id="login-form">
+                <div class="input-group"><label for="username">Username</label><input type="text" id="username" required></div>
+                <div class="input-group"><label for="password">Password</label><input type="password" id="password" required></div>
+                <div id="login-error" class="form-error"></div>
+                <button type="submit" id="login-button">Login</button>
+            </form>
+            <p class="form-toggle-link">No account? <a href="#" id="show-register-link">Register for an account</a></p>
+        </div>
+
+        <div id="register-form-container" class="hidden">
+            <h2>Register New Account</h2>
+            <form id="register-form">
+                <div class="input-group"><label for="reg-username">Username</label><input type="text" id="reg-username" required></div>
+                <div class="input-group"><label for="reg-password">Password</label><input type="password" id="reg-password" required></div>
+                <div class="input-group"><label for="reg-password-confirm">Confirm Password</label><input type="password" id="reg-password-confirm" required></div>
+                <div id="register-error" class="form-error"></div>
+                <button type="submit" id="register-button">Register</button>
+            </form>
+            <p class="form-toggle-link">Already have an account? <a href="#" id="show-login-link">Login here</a></p>
+        </div>
     </div>
   </div>
   

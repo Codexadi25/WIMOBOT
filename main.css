@@ -25,9 +25,11 @@ button { cursor: pointer; }
 .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
 .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
 .input-group textarea { resize: vertical; min-height: 80px; }
-#login-button { width: 100%; padding: 12px; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
-#login-button:hover { background-color: var(--primary-hover); }
-#login-error { color: var(--danger-color); margin-top: 15px; font-size: 14px; min-height: 20px; }
+#login-button, #register-button { width: 100%; padding: 12px; background-color: var(--primary-color); color: var(--white-color); border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; }
+#login-button:hover, #register-button:hover { background-color: var(--primary-hover); }
+.form-error { color: var(--danger-color); margin-top: 15px; font-size: 14px; min-height: 20px; }
+.form-toggle-link { font-size: 14px; margin-top: 20px; color: #555; }
+.form-toggle-link a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
 .app-header { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; padding: 0 20px; }
 .header-left h1 { font-size: 24px; color: var(--dark-color); }
 .header-center { flex-grow: 1; text-align: center; }
@@ -46,7 +48,6 @@ button { cursor: pointer; }
 .main-content-wrapper { display: flex; gap: 20px; max-width: 1600px; margin: 10px auto 30px auto; }
 .panel { background-color: var(--white-color); border-radius: var(--border-radius); box-shadow: var(--shadow); padding: 20px; height: 75vh; min-height: 500px; overflow-y: auto; }
 .full-width-panel { flex-grow: 1; }
-#admin-tools-panel { flex: 0 0 280px; }
 .container { flex-grow: 1; display: flex; }
 .left-panel { flex: 1; border-right: 1px solid #e0e0e0; padding-right: 15px; overflow-y: auto; }
 .right-panel { flex: 2; display: flex; flex-direction: column; overflow: hidden; padding-left: 15px; }
@@ -84,7 +85,7 @@ button { cursor: pointer; }
 .modal-btn.primary { background-color: var(--primary-color); color: var(--white-color); border-color: var(--primary-color); }
 .modal-btn.primary:hover { background-color: var(--primary-hover); }
 
-/* --- Toast Notifications (Moved to Top-Right) --- */
+/* --- Toast Notifications --- */
 #toast-container { position: fixed; top: 80px; right: 20px; z-index: 4000; }
 .toast { background-color: var(--dark-color); color: var(--white-color); padding: 15px 20px; border-radius: var(--border-radius); margin-bottom: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); opacity: 0; transform: translateY(-20px); transition: all 0.3s ease; }
 .toast.success { background-color: var(--success-color); }
