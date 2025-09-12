@@ -1,14 +1,5 @@
 # Dependencies
 /node_modules
 
-# Logs
-logs
-*.log
-npm-debug.log*
-
 # Environment variables
 .env
-
-# Operating System Files
-.DS_Store
-Thumbs.db
