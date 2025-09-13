@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/header') %>
+</head>
+<body>
+    <div class="app-container">
+        <header class="top-bar">
+            <div class="search-container">
+                <i class="icon-search"></i>
+                <input type="text" id="searchInput" placeholder="Search cands and notes by text or #tag...">
+            </div>
+            <div class="user-info">
+                <span>Welcome, <strong><%= user.username %></strong> (<%= user.role %>)</span>
+                <a href="/auth/logout" class="logout-btn">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="left-panel">
+                <div class="tabs">
+                    <button class="tab-link active" data-tab="Cands">Cands</button>
+                    <button class="tab-link" data-tab="PNs">Private Notes</button>
+                    <% if (user.role === 'admin' || user.role === 'editor') { %>
+                        <button class="tab-link" data-tab="Logger">Logger</button>
+                    <% } %>
+                    <% if (user.role === 'admin') { %>
+                        <button class="tab-link" data-tab="Admin">Admin Panel</button>
+                    <% } %>
+                </div>
+                
+                <div id="Cands" class="tab-content active">
+                    <%- include('partials/candPanel', { categories: categories, allTags: allTags }) %>
+                </div>
+                <div id="PNs" class="tab-content">
+                    <%- include('partials/pnPanel', { privateNotes: privateNotes }) %>
+                </div>
+                <% if (user.role === 'admin' || user.role === 'editor') { %>
+                <div id="Logger" class="tab-content">
+                    <%- include('partials/loggerPanel') %>
+                </div>
+                <% } %>
+                 <% if (user.role === 'admin') { %>
+                <div id="Admin" class="tab-content">
+                    <%- include('partials/adminPanel') %>
+                </div>
+                 <% } %>
+            </div>
+
+            <aside class="right-panel">
+                 <%- include('partials/calculator') %>
+            </aside>
+        </main>
+
+        <%- include('partials/footer') %>
+    </div>
+    
+    <div id="toast-container"></div>
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<div class="panel-header">
+    <h2>My Private Notes</h2>
+    <button class="action-btn">New Note</button>
+</div>
+<div class="content-scroll-area">
+    <div id="pn-list">
+    <% privateNotes.forEach(note => { %>
+        <div class="pn-item" data-note-id="<%= note._id %>">
+            <h4><%= note.title %></h4>
+            <p><%= note.content %></p>
+            <div class="pn-tags">
+                 <% note.tags.forEach(tag => { %>
+                    <span>#<%= tag %></span>
+                <% }) %>
+            </div>
+        </div>
+    <% }) %>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="panel-header">
+    <h2>Admin Dashboard</h2>
+</div>
+<div class="content-scroll-area admin-forms">
+    <div class="admin-section">
+        <h3>Bulk Upload Cands (JSON)</h3>
+        <p>This will **delete all existing** canned responses and replace them with the content of the file.</p>
+        <form id="bulk-upload-form" enctype="multipart/form-data">
+            <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
+            <button type="submit" class="action-btn">Upload and Reset</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Bulk Create Users</h3>
+        <p>Enter usernames, one per line. Passwords will be the same as the username.</p>
+        <form id="bulk-user-form">
+            <textarea id="bulk-usernames" rows="5" placeholder="user1\nuser2\nuser3"></textarea>
+            <button type="submit" class="action-btn">Create Users</button>
+        </form>
+        <div id="bulk-user-results" class="results-box" style="display:none;">
+            <h4>Generated Credentials <button id="copy-creds-btn">Copy All</button></h4>
+            <pre id="new-creds-output"></pre>
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h3>Manage Users</h3>
+        <div id="user-management-list">
+            </div>
+    </div>
+</div>

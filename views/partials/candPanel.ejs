@@ -1,0 +1,34 @@
+<div class="panel-header">
+    <h2>Canned Responses</h2>
+    <div class="tag-filters">
+        <button id="clearFilters" class="tag-filter clear">Clear Filters</button>
+        <% allTags.forEach(tag => { %>
+            <button class="tag-filter" data-tag="<%= tag %>">#<%= tag %></button>
+        <% }) %>
+    </div>
+</div>
+
+<div class="content-scroll-area">
+    <% categories.forEach(category => { %>
+        <div class="category-group">
+            <h3 class="category-title"><%= category.title %></h3>
+            <div class="cand-list">
+                <% category.templates.forEach(template => { %>
+                    <div class="cand-item" data-tags="<%= template.tags.join(' ') %>">
+                        <p class="cand-text"><%= template.text %></p>
+                        <div class="cand-footer">
+                            <div class="cand-tags">
+                                <% template.tags.forEach(tag => { %>
+                                    <span>#<%= tag %></span>
+                                <% }) %>
+                            </div>
+                            <button class="copy-btn" title="Copy to clipboard">
+                                <i class="icon-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% }) %>
+</div>
