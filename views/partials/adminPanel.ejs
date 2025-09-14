@@ -3,8 +3,41 @@
 </div>
 <div class="content-scroll-area admin-forms">
     <div class="admin-section">
-        <h3>Bulk Upload Cands (JSON)</h3>
-        <p>This will **delete all existing** canned responses and replace them with the content of the file.</p>
+        <h3>Bulk Upload Cands (JSON) <button id="toggle-json-sample" class="link-btn">Show Sample</button></h3>
+        <p>This will <strong>delete all existing</strong> canned responses and replace them with the content of the file.</p>
+        
+        <div id="json-sample" style="display: none;">
+            <p>Your file must be a JSON object with a single key "categories", which is an array of category objects, like this:</p>
+            <pre class="code-block">
+{
+  "categories": [
+    {
+      "title": "Category Title One",
+      "templates": [
+        {
+          "tags": ["tag1", "tag2"],
+          "text": "This is the first canned response text."
+        },
+        {
+          "tags": ["tag1", "tag3"],
+          "text": "This is the second canned response text."
+        }
+      ]
+    },
+    {
+      "title": "Category Title Two",
+      "templates": [
+        {
+          "tags": ["tag4"],
+          "text": "Another response in a different category."
+        }
+      ]
+    }
+  ]
+}
+            </pre>
+        </div>
+
         <form id="bulk-upload-form" enctype="multipart/form-data">
             <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
             <button type="submit" class="action-btn">Upload and Reset</button>
@@ -25,8 +58,14 @@
     </div>
     
     <div class="admin-section">
-        <h3>Manage Users</h3>
+        <h3>User Management</h3>
+        <p>Manage user accounts and their access levels.</p>
+        <div class="user-controls">
+            <button id="refreshUsersBtn" class="action-btn">Refresh Users</button>
+            <button id="cleanupLogsBtn" class="action-btn">Cleanup Logs</button>
+        </div>
         <div id="user-management-list">
-            </div>
+            <p>Click "Refresh Users" to load user list.</p>
+        </div>
     </div>
 </div>

@@ -1,34 +1,56 @@
 <div class="panel-header">
     <h2>Canned Responses</h2>
-    <div class="tag-filters">
-        <button id="clearFilters" class="tag-filter clear">Clear Filters</button>
-        <% allTags.forEach(tag => { %>
-            <button class="tag-filter" data-tag="<%= tag %>">#<%= tag %></button>
-        <% }) %>
-    </div>
+    <button id="btn-create-category" class="action-btn">New Category</button>
 </div>
 
-<div class="content-scroll-area">
-    <% categories.forEach(category => { %>
-        <div class="category-group">
-            <h3 class="category-title"><%= category.title %></h3>
-            <div class="cand-list">
-                <% category.templates.forEach(template => { %>
-                    <div class="cand-item" data-tags="<%= template.tags.join(' ') %>">
-                        <p class="cand-text"><%= template.text %></p>
-                        <div class="cand-footer">
-                            <div class="cand-tags">
-                                <% template.tags.forEach(tag => { %>
-                                    <span>#<%= tag %></span>
-                                <% }) %>
-                            </div>
-                            <button class="copy-btn" title="Copy to clipboard">
-                                <i class="icon-copy"></i> Copy
-                            </button>
+<div class="content-panel-grid">
+    <nav class="category-nav">
+        <button class="category-nav-btn active" data-category-id="all">All Categories</button>
+        <% categories.forEach(category => { %>
+            <div class="category-nav-item">
+                <button class="category-nav-btn" data-category-id="<%= category._id %>"><%= category.title %></button>
+            </div>
+        <% }) %>
+    </nav>
+
+    <div class="scroll-area">
+        <div class="tag-filters">
+             <% allTags.forEach(tag => { %>
+                <button class="tag-filter" data-tag="<%= tag %>">#<%= tag %></button>
+            <% }) %>
+            <button class="tag-filter clear-filters-btn" id="clearFilters">Clear Filters</button>
+        </div>
+        <div id="search-indicator" class="search-mode-indicator"></div>
+        <div id="cands-list-container">
+            <% categories.forEach(category => { %>
+                <div class="category-group" data-category-id="<%= category._id %>">
+                    <div class="category-header">
+                        <h3 class="category-title" data-category-title="<%= category.title %>"><%= category.title %></h3>
+                        <div class="category-actions">
+                            <button class="btn-add-cand action-btn-sm">Add New Cand</button>
+                            <button class="btn-edit-category action-btn-sm" title="Edit Category">Edit</button>
+                            <button class="btn-delete-category action-btn-sm" title="Delete Category">Delete</button>
                         </div>
                     </div>
-                <% }) %>
-            </div>
+                    <% category.templates.forEach(template => { %>
+                        <div class="cand-item" data-category-id="<%= category._id %>" data-template-id="<%= template._id %>" data-tags="<%= template.tags.join(' ') %>" title="Click to copy">
+                            <div class="cand-header">
+                                <span class="cand-category-label">CATEGORY: <%= category.title.toUpperCase() %></span>
+                                <div class="cand-actions">
+                                    <button class="icon-btn btn-edit-cand" title="Edit Cand">&#9998;</button>
+                                    <button class="icon-btn btn-delete-cand" title="Delete Cand">&#128465;</button>
+                                </div>
+                            </div>
+                            <div class="cand-tags">
+                                <% template.tags.forEach(tag => { %>
+                                    <span class="tag">#<%= tag %></span>
+                                <% }) %>
+                            </div>
+                            <p class="cand-text"><%= template.text %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            <% }) %>
         </div>
-    <% }) %>
+    </div>
 </div>
