@@ -10,17 +10,19 @@
             <div class="category-nav-item">
                 <button class="category-nav-btn" data-category-id="<%= category._id %>"><%= category.title %></button>
             </div>
-        <% }) %>
+            <% }) %>
     </nav>
-
+        
     <div class="scroll-area">
         <div class="tag-filters">
              <% allTags.forEach(tag => { %>
-                <button class="tag-filter" data-tag="<%= tag %>">#<%= tag %></button>
+                <button class="tag-filter" data-tag="<%= tag %>"><%= tag %></button>
             <% }) %>
             <button class="tag-filter clear-filters-btn" id="clearFilters">Clear Filters</button>
         </div>
-        <div id="search-indicator" class="search-mode-indicator"></div>
+        <div id="search-indicator" class="search-mode-indicator">
+            
+        </div>
         <div id="cands-list-container">
             <% categories.forEach(category => { %>
                 <div class="category-group" data-category-id="<%= category._id %>">

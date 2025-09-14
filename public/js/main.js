@@ -571,6 +571,34 @@ document.addEventListener('change', async (e) => {
     }
 });
 
+    // =========================================================================
+    // --- Keep-alive Ping ---
+    // =========================================================================
+
+    // Keep-alive ping to keep session cookie fresh and help prevent host idle shutdown.
+    // Interval chosen < typical cookie/session timeout (4 minutes).
+    const KEEP_ALIVE_INTERVAL = 4 * 60 * 1000; // 4 minutes
+    let keepAliveTimer = null;
+
+    async function keepAlivePing() {
+        try {
+            await fetch('/api/ping', { method: 'GET', credentials: 'same-origin', cache: 'no-store' });
+            console.debug('Keep-alive ping sent');
+        } catch (err) {
+            console.warn('Keep-alive ping failed', err);
+        }
+    }
+
+    // initial slight delay to avoid many simultaneous pings on page load
+    setTimeout(() => {
+        keepAlivePing();
+        keepAliveTimer = setInterval(keepAlivePing, KEEP_ALIVE_INTERVAL);
+    }, 2000);
+
+    window.addEventListener('beforeunload', () => {
+        if (keepAliveTimer) clearInterval(keepAliveTimer);
+    });
+
     // --- Toast Notification Function (same as before) ---
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');

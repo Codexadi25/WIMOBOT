@@ -38,12 +38,16 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false, // avoid creating sessions for anonymous requests
+    rolling: true, // reset cookie expiration on every response
     cookie: {
         secure: process.env.NODE_ENV === 'production', // only send over HTTPS in prod
-        sameSite: 'lax', // helps with CSRF while allowing top-level navigation cookies
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days (adjust if needed)
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
 }));
+
+// mount ping endpoint (keep it under /api so client fetch('/api/ping') works)
+app.use('/api', require('./routes/ping'));
 
 // Routes
 app.use('/', authRouter);

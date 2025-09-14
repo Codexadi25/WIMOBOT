@@ -100,11 +100,11 @@ body {
 #searchInput {
     width: 50vw;
     padding: 0.6rem 0.8rem 0.6rem 2.5rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
+    border-radius: 32px;
+    border: 2px solid #007bff;
     font-size: 1rem;
 }
-.icon-search::before { content: '🔍'; position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+/* .searchInput::before { content: '🔍'; position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); } */
 
 .user-info {
     display: flex;
@@ -172,7 +172,7 @@ body {
 .tag-filter {
     padding: 0.25rem 0.75rem;
     border: 1px solid var(--border-color);
-    background-color: #fff;
+    background-color: #ccecff;
     border-radius: 1rem;
     cursor: pointer;
     font-size: 0.85rem;
@@ -183,13 +183,13 @@ body {
     border-color: var(--primary-color);
 }
 .tag-filter.clear, .clear-filters-btn { 
-    background-color: #6c757d; 
+    background-color: rgb(255, 0, 0); 
     color: #fff; 
-    border-color: #6c757d;
+    border-color: #ffffff;
 }
 .clear-filters-btn:hover {
-    background-color: #5a6268;
-    border-color: #5a6268;
+    background-color: #e00000;
+    border-color: #fff;
 }
 
 /* --- Canned Responses --- */
