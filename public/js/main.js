@@ -1,30 +1,79 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // =========================================================================
     // --- WebSocket Connection ---
-    const connectWebSocket = () => {
-        const ws = new WebSocket(`wss://${window.location.host}` || `ws://${window.location.host}`);
+    // =========================================================================
 
-        ws.onopen = () => console.log('Connected to WebSocket server');
-        
+    // improved ws/wss selection and avoid repeated toasts when reconnection is expected
+    let wsReconnectTimer = null;
+    const connectWebSocket = () => {
+        // choose correct protocol depending on page protocol
+        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${proto}//${window.location.host}`;
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+            console.log('Connected to WebSocket server');
+            if (wsReconnectTimer) {
+                clearTimeout(wsReconnectTimer);
+                wsReconnectTimer = null;
+            }
+        };
+
         ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'DATA_UPDATE') {
-                showToast(`Update received: ${data.payload.message}. Refreshing...`, 'success');
-                setTimeout(() => window.location.reload(), 2500);
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'DATA_UPDATE') {
+                    showToast(`Live update received. Refreshing...`, 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            } catch (err) {
+                console.error('WS message parse error', err);
             }
         };
 
         ws.onclose = () => {
-            showToast('Connection lost. Reconnecting in 5 seconds...', 'error');
-            setTimeout(connectWebSocket, 5000);
+            // only show one toast per reconnect attempt
+            if (!wsReconnectTimer) {
+                showToast('Connection lost. Reconnecting in 5 seconds...', 'error');
+            }
+            wsReconnectTimer = setTimeout(() => {
+                wsReconnectTimer = null;
+                connectWebSocket();
+            }, 5000);
         };
-        
+
         ws.onerror = (err) => {
-            console.error('WebSocket Error:', err);
-            ws.close();
+            console.error('WebSocket error', err);
+            // let onclose handle reconnection and toast
         };
     };
     connectWebSocket();
+
+    // =========================================================================
+    // --- API Helper Function (ensure cookies are sent with fetch) ---
+    // =========================================================================
+    const apiRequest = async (url, method = 'GET', body = null) => {
+        try {
+            const options = { method, headers: {}, credentials: 'same-origin' }; // include session cookie
+            if (body instanceof FormData) {
+                options.body = body;
+            } else if (body) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(body);
+            }
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                let errorData = {};
+                try { errorData = await response.json(); } catch (e) {}
+                throw new Error(errorData.message || `API error ${response.status}`);
+            }
+            return method !== 'DELETE' ? response.json() : null;
+        } catch (error) {
+            showToast(error.message || 'Network error', 'error');
+            throw error;
+        }
+    };
 
     // --- Category Navigation Filter ---
     document.body.addEventListener('click', (e) => {
@@ -158,35 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
     });
-
-    // --- API Helper ---
-    const apiRequest = async (url, method = 'GET', body = null) => {
-        try {
-            const options = {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-            };
-            if (body) options.body = JSON.stringify(body);
-            const response = await fetch(url, options);
-            
-            // Check if response is HTML (error page) instead of JSON
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                const text = await response.text();
-                throw new Error(`Server returned HTML instead of JSON. Status: ${response.status}`);
-            }
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'An API error occurred');
-            }
-            return method !== 'DELETE' ? response.json() : null;
-        } catch (error) {
-            console.error('API Request Error:', error);
-            showToast(error.message, 'error');
-            throw error;
-        }
-    };
 
     // --- Main Event Listener (Event Delegation) ---
     document.body.addEventListener('click', async (e) => {

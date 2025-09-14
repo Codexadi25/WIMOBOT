@@ -15,6 +15,12 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
+// If your app is behind a proxy/load balancer in production (e.g., Heroku, nginx),
+// enable trust proxy so secure cookies work properly.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Initialize WebSocket Server
 const wss = initializeWebSocketServer(server);
 app.set('wss', wss); // Make WSS available in controllers
@@ -31,8 +37,12 @@ app.use(requestLogger); // Add request logging middleware
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    saveUninitialized: false, // avoid creating sessions for anonymous requests
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // only send over HTTPS in prod
+        sameSite: 'lax', // helps with CSRF while allowing top-level navigation cookies
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days (adjust if needed)
+    }
 }));
 
 // Routes
@@ -40,6 +50,10 @@ app.use('/', authRouter);
 app.use('/', require('./routes/viewRoutes'));
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/api/cands', require('./routes/api/candRoutes'));
+const adminRouter = require('./routes/admin');
+const apiUsersRouter = require('./routes/users'); // for legacy /api/users/bulk route
+app.use('/api/admin', adminRouter);
+app.use('/api', apiUsersRouter);
 // ... other API routes
 
 // Error Handler
