@@ -7,6 +7,7 @@ const connectDB = require('./config/database');
 const { initializeWebSocketServer } = require('./utils/webSocketServer');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const requestLogger = require('./middleware/requestLogger');
+const authRouter = require('./routes/auth');
 
 // Connect to Database
 connectDB();
@@ -35,6 +36,7 @@ app.use(session({
 }));
 
 // Routes
+app.use('/', authRouter);
 app.use('/', require('./routes/viewRoutes'));
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/api/cands', require('./routes/api/candRoutes'));

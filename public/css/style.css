@@ -95,10 +95,10 @@ body {
 /* --- Top Bar Components --- */
 .search-container {
     position: relative;
-    width: 40%;
+    width: 100%;
 }
 #searchInput {
-    width: 100%;
+    width: 50vw;
     padding: 0.6rem 0.8rem 0.6rem 2.5rem;
     border-radius: 6px;
     border: 1px solid var(--border-color);
