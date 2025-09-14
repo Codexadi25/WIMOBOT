@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- WebSocket Connection ---
     const connectWebSocket = () => {
-        const ws = new WebSocket(`ws://${window.location.host}`);
+        const ws = new WebSocket(`wss://${window.location.host}`);
 
         ws.onopen = () => console.log('Connected to WebSocket server');
         
