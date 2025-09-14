@@ -4,6 +4,8 @@ const User = require('../models/User');
 const { broadcastUpdate } = require('../utils/webSocketServer');
 const Logger = require('../utils/logger');
 const asyncHandler = require('express-async-handler');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 // @desc    Bulk upload Cands from JSON file, reseting existing data
 // @route   POST /api/admin/bulk-upload-cands
@@ -157,4 +159,63 @@ exports.cleanupLogs = asyncHandler(async (req, res) => {
         message: 'Log cleanup completed successfully',
         deletedOldLogs: deletedOldLogs.deletedCount
     });
+});
+
+// @desc    Update user password (admin sets a new password)
+// @route   PUT /api/admin/users/:id/password
+// @access  Admin
+exports.updateUserPassword = asyncHandler(async (req, res) => {
+    const userId = req.params.id;
+    const { newPassword } = req.body || {};
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
+        res.status(400);
+        throw new Error('Password must be at least 6 characters long.');
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    await Logger.logDatabaseChange('UPDATE', 'User', userId, { password: '***' }, { password: '***' }, req.session.user.id, req.session.user.username, {
+        ip: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        description: 'Admin updated user password'
+    });
+
+    res.status(200).json({ message: 'Password updated successfully' });
+});
+
+// @desc    Reset user password and return a temporary password (admin action)
+// @route   POST /api/admin/users/:id/reset-password
+// @access  Admin
+exports.resetUserPassword = asyncHandler(async (req, res) => {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    // generate a secure temporary password (12 chars)
+    const tempPassword = crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '').slice(0, 12);
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(tempPassword, salt);
+    await user.save();
+
+    await Logger.logDatabaseChange('UPDATE', 'User', userId, { password: '***' }, { password: '***' }, req.session.user.id, req.session.user.username, {
+        ip: req.ip || req.connection.remoteAddress,
+        userAgent: req.get('User-Agent'),
+        description: 'Admin reset user password'
+    });
+
+    // return the temporary plain password once (admin should copy/save it)
+    res.status(200).json({ message: 'Password reset successfully', tempPassword });
 });

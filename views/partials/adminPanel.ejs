@@ -1,11 +1,13 @@
 <div class="panel-header">
     <h2>Admin Dashboard</h2>
 </div>
+
 <div class="content-scroll-area admin-forms">
+
     <div class="admin-section">
         <h3>Bulk Upload Cands (JSON) <button id="toggle-json-sample" class="link-btn">Show Sample</button></h3>
         <p>This will <strong>delete all existing</strong> canned responses and replace them with the content of the file.</p>
-        
+
         <div id="json-sample" style="display: none;">
             <p>Your file must be a JSON object with a single key "categories", which is an array of category objects, like this:</p>
             <pre class="code-block">
@@ -46,9 +48,9 @@
 
     <div class="admin-section">
         <h3>Bulk Create Users</h3>
-        <p>Enter usernames, one per line. Passwords will be the same as the username.</p>
+        <p>Enter usernames, one per line. Passwords will be the same as the username (change after creation).</p>
         <form id="bulk-user-form">
-            <textarea id="bulk-usernames" rows="5" placeholder="user1\nuser2\nuser3"></textarea>
+            <textarea id="bulk-usernames" rows="5" placeholder="user1&#10;user2&#10;user3"></textarea>
             <button type="submit" class="action-btn">Create Users</button>
         </form>
         <div id="bulk-user-results" class="results-box" style="display:none;">
@@ -56,16 +58,32 @@
             <pre id="new-creds-output"></pre>
         </div>
     </div>
-    
+
     <div class="admin-section">
         <h3>User Management</h3>
-        <p>Manage user accounts and their access levels.</p>
-        <div class="user-controls">
+        <p>Manage user accounts, change roles, set or reset passwords, and delete users. Admin only.</p>
+
+        <div class="user-controls" style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
             <button id="refreshUsersBtn" class="action-btn">Refresh Users</button>
+            <button id="refreshLogsBtn" class="action-btn">Refresh Logs</button>
             <button id="cleanupLogsBtn" class="action-btn">Cleanup Logs</button>
+            <div style="margin-left:auto">
+                <input id="admin-user-search" type="search" placeholder="Filter users..." style="padding:6px;border-radius:6px;border:1px solid #ddd">
+            </div>
         </div>
-        <div id="user-management-list">
-            <p>Click "Refresh Users" to load user list.</p>
+
+        <!-- Container where the client script will render the users table with role-select, reset/set password, delete -->
+        <div id="admin-users-container" class="panel" style="padding:12px;min-height:120px;">
+            <p class="small">Click "Refresh Users" to load user list.</p>
         </div>
     </div>
+
+    <div class="admin-section">
+        <h3>Logs</h3>
+        <p>View recent application logs. Use <em>Refresh Logs</em> to fetch latest.</p>
+        <div id="log-list" class="panel" style="padding:12px;min-height:160px;">
+            <p class="small">No logs loaded. Click "Refresh Logs" to fetch.</p>
+        </div>
+    </div>
+
 </div>

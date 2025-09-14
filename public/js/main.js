@@ -400,7 +400,158 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Admin Panel & Logger (making existing functionality work) ---
 
-// --- Toast Notification Function (same as before) ---
+/* -----------------------------
+   Admin: User Management UI
+   Requires: element with id "admin-users-container"
+   ----------------------------- */
+async function fetchAndRenderAdminUsers() {
+    const container = document.getElementById('admin-users-container');
+    if (!container) return;
+    try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) throw new Error('Failed to load users');
+        const users = await res.json();
+
+        // build table
+        const rows = users.map(u => {
+            return `
+            <tr data-user-id="${u._id}">
+                <td>${u.username}</td>
+                <td>
+                    <select class="user-role-select" data-user-id="${u._id}">
+                        <option value="user" ${u.role === 'user' ? 'selected' : ''}>user</option>
+                        <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>editor</option>
+                        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>admin</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-reset-password" data-user-id="${u._id}">Reset Password</button>
+                    <button class="btn btn-sm btn-set-password" data-user-id="${u._id}">Set Password</button>
+                    <button class="btn btn-sm btn-delete-user" data-user-id="${u._id}">Delete</button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        container.innerHTML = `
+            <table class="admin-table" style="width:100%">
+                <thead><tr><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
+                <tbody id="admin-users-table-body">${rows}</tbody>
+            </table>
+        `;
+    } catch (err) {
+        console.error(err);
+        showToast('Unable to load users', 'error');
+    }
+}
+
+// Listen for actions (delegated)
+document.addEventListener('click', async (e) => {
+    const target = e.target;
+    // Role change handled on 'change' event below (delegated)
+    if (target.matches('.btn-reset-password')) {
+        const userId = target.dataset.userId;
+        if (!userId) return;
+        if (!confirm('Reset password for this user? A temporary password will be generated.')) return;
+        try {
+            const res = await fetch(`/api/admin/users/${userId}/reset-password`, { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Reset failed');
+            // show temporary password in modal so admin can copy it
+            if (modal && modalForm && modalTitle) {
+                modalTitle.textContent = `Temporary password for ${userId}`;
+                modalForm.innerHTML = `
+                    <p class="small">Temporary password (copy it now, it will not be shown again):</p>
+                    <pre id="temp-pass" style="padding:10px;background:#f6f8fa;border-radius:6px;">${data.tempPassword}</pre>
+                    <button id="copy-temp-pass" class="action-btn">Copy Temporary Password</button>
+                `;
+                openModal();
+                document.getElementById('copy-temp-pass')?.addEventListener('click', () => {
+                    const text = document.getElementById('temp-pass')?.textContent || '';
+                    navigator.clipboard.writeText(text).then(() => showToast('Password copied!'));
+                });
+            } else {
+                showToast(`Temp password: ${data.tempPassword}`, 'success');
+            }
+            await fetchAndRenderAdminUsers();
+        } catch (err) {
+            showToast(err.message || 'Reset failed', 'error');
+        }
+        return;
+    }
+
+    if (target.matches('.btn-set-password')) {
+        const userId = target.dataset.userId;
+        if (!userId) return;
+        // open modal with form
+        if (!modal || !modalForm || !modalTitle) return;
+        modalTitle.textContent = 'Set New Password';
+        modalForm.innerHTML = `
+            <label for="adminNewPassword">New Password</label>
+            <input id="adminNewPassword" type="password" required placeholder="Enter new password (min 6 chars)">
+            <button type="submit" id="adminSetPasswordSubmit" class="action-btn">Set Password</button>
+        `;
+        openModal();
+        modalForm.onsubmit = async (ev) => {
+            ev.preventDefault();
+            const newPassword = document.getElementById('adminNewPassword')?.value || '';
+            if (newPassword.length < 6) return showToast('Password must be at least 6 characters', 'error');
+            try {
+                const res = await fetch(`/api/admin/users/${userId}/password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to set password');
+                showToast('Password updated', 'success');
+                closeModal();
+            } catch (err) {
+                showToast(err.message || 'Failed to set password', 'error');
+            }
+        };
+        return;
+    }
+
+    if (target.matches('.btn-delete-user')) {
+        const userId = target.dataset.userId;
+        if (!userId) return;
+        if (!confirm('Delete this user? This action cannot be undone.')) return;
+        try {
+            const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Delete failed');
+            showToast('User deleted', 'success');
+            await fetchAndRenderAdminUsers();
+        } catch (err) {
+            showToast(err.message || 'Delete failed', 'error');
+        }
+        return;
+    }
+});
+
+// delegated change for role selects
+document.addEventListener('change', async (e) => {
+    const target = e.target;
+    if (target.matches('.user-role-select')) {
+        const userId = target.dataset.userId;
+        const role = target.value;
+        try {
+            const res = await fetch(`/api/admin/users/${userId}/role`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Role update failed');
+            showToast('Role updated', 'success');
+            await fetchAndRenderAdminUsers();
+        } catch (err) {
+            showToast(err.message || 'Role update failed', 'error');
+        }
+    }
+});
+
+    // --- Toast Notification Function (same as before) ---
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
