@@ -190,6 +190,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Main Event Listener (Event Delegation) ---
     document.body.addEventListener('click', async (e) => {
+        const target = e.target;
+        const closest = (sel) => target.closest(sel);
+        
+        // --- Tab Switching (use closest so clicking on children still works) ---
+        const tabLink = target.closest('.tab-link');
+        if (tabLink) {
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tabLink.classList.add('active');
+            const tabId = tabLink.dataset.tab;
+            if (tabId) {
+                const tabEl = document.getElementById(tabId);
+                if (tabEl) tabEl.classList.add('active');
+            }
+            return;
+        }
+
         // --- Category CRUD ---
         if (e.target.matches('#btn-create-category')) {
             showCategoryForm({});
