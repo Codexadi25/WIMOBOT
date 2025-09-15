@@ -17,8 +17,10 @@
 
     <div class="scroll-area">
         <div class="panel-header" style="padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
-             <button id="btn-create-pn" class="action-btn-sm">Add New Note</button>
-             <button class="clear-filters-btn" id="clearFiltersPN">Clear Filters</button>
+            <% if (user.role === 'admin' || user.role === 'editor' || user.role === 'user') { %>
+                <button id="btn-create-pn" class="action-btn-sm">Add New Note</button>
+            <% } %>
+            <button class="clear-filters-btn" id="clearFiltersPN">Clear Filters</button>
         </div>
        
         <div id="pns-list-container">
