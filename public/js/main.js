@@ -577,7 +577,7 @@ document.addEventListener('change', async (e) => {
 
     // Keep-alive ping to keep session cookie fresh and help prevent host idle shutdown.
     // Interval chosen < typical cookie/session timeout (4 minutes).
-    const KEEP_ALIVE_INTERVAL = 30 * 60 * 1000; // 30 minutes
+    const KEEP_ALIVE_INTERVAL = 3 * 60 * 1000; // 3 minutes
     let keepAliveTimer = null;
 
     async function keepAlivePing() {

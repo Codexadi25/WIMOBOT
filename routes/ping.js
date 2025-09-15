@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ROTATE_INTERVAL = 30 * 60 * 1000; // 30 minutes
+const ROTATE_INTERVAL = 3 * 60 * 1000; // 3 minutes
 
 // GET /api/ping
 // Touches session to extend cookie and rotates session id periodically for security.
