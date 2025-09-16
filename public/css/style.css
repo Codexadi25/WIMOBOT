@@ -946,16 +946,14 @@ body.modal-open {
 #admin-users-table tbody tr:nth-child(even) { background:#f7fbff; }
 #admin-users-table td { padding:10px; border-bottom:1px solid #f0f4f8; vertical-align:middle; }
 #form-modal{
-    height: 80vh;
-    width: 30vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* Use overlay defaults defined above; ensure proper centering */
+    height: auto;
+    width: auto;
 }
 .modal-close-btn{
-    position: relative;
-    right: 0;
-    top: 0;
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }
 .masked-pass { font-family: monospace; letter-spacing: 2px; }
 .btn-set-password{ background-color: #09ff00; color: #024400;}
