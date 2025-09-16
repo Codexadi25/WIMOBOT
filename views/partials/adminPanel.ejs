@@ -5,10 +5,16 @@
 <div class="content-scroll-area admin-forms">
 
   <div class="admin-section">
-    <h3>Bulk Upload Cands (JSON) <button id="toggle-json-sample" class="link-btn">Show Sample</button></h3>
+    <h3>Bulk Upload Cands (JSON) <button id="toggle-json-sample" class="link-btn" onclick="toggleJsonSample()">Show Sample</button></h3>
     <p>This will <strong>delete all existing</strong> canned responses and replace them with the content of the file.</p>
 
-    <div id="json-sample" style="display: none;" onclick="this.style.display='flex'">
+    <script>
+      function toggleJsonSample() {
+        const jsonSample = document.getElementById('json-sample');
+        jsonSample.style.display = jsonSample.style.display === 'none' ? 'block' : 'none';
+      }
+    </script>
+    <div id="json-sample" style="display: none;">
       <pre class="code-block">
 {
   "categories": [
