@@ -1,0 +1,318 @@
+/* Message Panel Styles */
+.message-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+    align-items: end;
+}
+
+.message-item {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    transition: box-shadow 0.2s ease;
+    position: relative;
+}
+
+.message-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.message-item.unread {
+    border-left: 4px solid var(--primary-color);
+    background: #f8f9ff;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.message-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.message-type {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.message-type.announcement { background: #e3f2fd; color: #1976d2; }
+.message-type.maintenance { background: #fff3e0; color: #f57c00; }
+.message-type.update { background: #e8f5e8; color: #388e3c; }
+.message-type.warning { background: #ffebee; color: #d32f2f; }
+.message-type.info { background: #f5f5f5; color: #616161; }
+
+.message-priority {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.message-priority.low { background: #e8f5e8; color: #2e7d32; }
+.message-priority.medium { background: #fff3e0; color: #f57c00; }
+.message-priority.high { background: #ffebee; color: #d32f2f; }
+.message-priority.urgent { 
+    background: #fce4ec; 
+    color: #c2185b; 
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.message-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0.5rem 0;
+}
+
+.message-content {
+    color: var(--text-muted);
+    line-height: 1.6;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.message-form > textarea {
+    width: 100%;
+}
+
+.message-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.message-author {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.message-dates {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.message-expiry {
+    color: #f57c00;
+    font-weight: 500;
+}
+
+.message-expiry.expired {
+    color: #d32f2f;
+}
+
+.message-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.message-read-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+}
+
+.message-read-btn:hover {
+    background: var(--primary-hover);
+}
+
+.message-read-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.message-read-status {
+    font-size: 0.8rem;
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+.message-target-info {
+    background: #e9ecef;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+.no-messages {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+/* Modal Styles for Messages */
+#message-modal .modal-content {
+    max-width: 700px;
+    width: 90%;
+}
+
+#message-modal .large-modal {
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Keep message creation form fields slightly narrower than container for readability */
+#message-modal .modal-content textarea,
+#message-modal .modal-content input[type="text"],
+#message-modal .modal-content select {
+    width: 100%;
+    max-width: 95%;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.target-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.target-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.target-options input[type="checkbox"] {
+    margin: 0;
+}
+
+#message-specific-users {
+    min-height: 100px;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    width: 100%;
+}
+
+#message-specific-users option {
+    padding: 0.25rem;
+}
+
+#message-specific-users:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.target-options label {
+    margin-right: 1rem;
+    font-weight: normal;
+}
+
+.target-options input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* Message List Animations */
+.message-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Priority Indicators */
+.message-item.priority-urgent {
+    border-left: 4px solid #c2185b;
+}
+
+.message-item.priority-high {
+    border-left: 4px solid #d32f2f;
+}
+
+.message-item.priority-medium {
+    border-left: 4px solid #f57c00;
+}
+
+.message-item.priority-low {
+    border-left: 4px solid #2e7d32;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .message-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .message-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .message-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .message-dates {
+        align-items: flex-start;
+    }
+}
+

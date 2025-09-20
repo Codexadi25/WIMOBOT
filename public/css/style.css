@@ -36,8 +36,8 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     font-size: 16px;
-    height: 100vh;
-    overflow: hidden;
+    height: 100%;
+    overflow: auto;
     margin: 0;
     padding: 0;
 }
@@ -55,9 +55,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1.5rem;
-    background-color: var(--panel-background);
+    /* background-color: var(--panel-background); */
+    background-color: #060b23;
     border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
+}
+
+.top-bar >h1 {
+    color: #fff;
 }
 
 .user-name{
@@ -109,10 +114,10 @@ body {
 
 .footer {
     width: 100%;
-    position: absolute;
+    position: relative;
     bottom: 0;
     padding: 0.75rem 1.5rem;
-    background-color: #e9ecef;
+    background-color: #f7f7f7;
     border-top: 1px solid var(--border-color);
     text-align: center;
     font-size: 0.85rem;
@@ -156,6 +161,7 @@ body {
     overflow-y: auto;
     min-height: 0;
     width: 70vw;
+    height: 100%;
     flex-grow: 1;
 }
 
@@ -232,11 +238,76 @@ body {
     font-size: 1rem;
     color: var(--text-muted);
     border-bottom: 3px solid transparent;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .tab-link.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
     font-weight: 600;
+}
+
+/* Notification Bell Styles */
+.notification-bell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.2rem;
+    animation: pulse 2s infinite;
+}
+
+.notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--error-color);
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Form Group Styles for Admin Panel */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-group select,
+.form-group input[type="file"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+.form-group select:focus,
+.form-group input[type="file"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 .tab-content {
     display: none;
@@ -258,7 +329,7 @@ body {
     width: 50vw;
     padding: 0.6rem 0.8rem 0.6rem 2.5rem;
     border-radius: 32px;
-    border: 2px solid #007bff;
+    /* border: 2px solid #007bff; */
     font-size: 1rem;
 }
 
@@ -963,3 +1034,13 @@ body.modal-open {
 .action-inline .btn-danger { background:#ffefef; border-color:#f3c6c6; color:#b23a3a; }
 .small-muted { font-size:12px; color:#6b7380; }
 .role-select { padding:6px 8px; border-radius:6px; border:1px solid #dcdcdc; background:#fff; }
+
+/* Global form controls sizing: keep inputs/textarea slightly smaller than container */
+.form-group textarea,
+.form-group input[type="text"],
+.form-group input[type="search"],
+.form-group input[type="password"],
+textarea {
+    width: 100%;
+    max-width: 95%;
+}

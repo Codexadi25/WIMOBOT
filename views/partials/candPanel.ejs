@@ -1,9 +1,3 @@
-<div class="panel-header">
-    <h2>Canned Responses</h2>
-    <% if (user.role === 'admin' || user.role === 'editor') { %>
-        <button id="btn-create-category" class="action-btn">Create Category</button>
-    <% } %>
-</div>
 <div class="tag-filters">
      <% allTags.forEach(tag => { %>
         <button class="tag-filter" data-tag="<%= tag %>"><%= tag %></button>
@@ -19,6 +13,9 @@
                 <button class="category-nav-btn" data-category-id="<%= category._id %>"><%= category.title %></button>
             </div>
         <% }) %>
+        <% if (user.role === 'admin' || user.role === 'editor') { %>
+            <button id="btn-create-category" class="action-btn category-nav-btn">+ Create Category</button>
+        <% } %>
     </nav>
         
     <div class="scroll-area">

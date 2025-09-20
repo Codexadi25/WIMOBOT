@@ -6,7 +6,7 @@
 
   <div class="admin-section">
     <h3>Bulk Upload Cands (JSON) <button id="toggle-json-sample" class="link-btn" onclick="toggleJsonSample()">Show Sample</button></h3>
-    <p>This will <strong>delete all existing</strong> canned responses and replace them with the content of the file.</p>
+    <p>Upload canned responses from a JSON file. Choose whether to append to existing data or replace all data.</p>
 
     <script>
       function toggleJsonSample() {
@@ -46,8 +46,18 @@
     </div>
 
     <form id="bulk-upload-form" enctype="multipart/form-data">
-      <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
-      <button type="submit" class="action-btn">Upload and Reset</button>
+      <div class="form-group">
+        <label for="upload-mode">Upload Mode:</label>
+        <select id="upload-mode" name="mode" required>
+          <option value="append" selected>Append to existing data (recommended)</option>
+          <option value="replace">Replace all existing data</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="jsonFile">JSON File:</label>
+        <input type="file" name="jsonFile" id="jsonFile" accept=".json" required>
+      </div>
+      <button type="submit" class="action-btn">Upload Canned Responses</button>
     </form>
   </div>
 
@@ -76,6 +86,7 @@
       <button id="refreshUsersBtn" class="action-btn">Refresh Users</button>
       <button id="refreshLogsBtn" class="action-btn">Refresh Logs</button>
       <button id="cleanupLogsBtn" class="action-btn">Cleanup Logs</button>
+      <button id="cleanupMessagesBtn" class="action-btn">Cleanup Messages</button>
       <div style="margin-left:auto">
         <input id="admin-user-search" type="search" placeholder="Filter users..." style="padding:6px;border-radius:6px;border:1px solid #ddd">
       </div>

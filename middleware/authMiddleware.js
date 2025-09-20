@@ -1,6 +1,11 @@
 const isAuthenticated = (req, res, next) => {
-    if (req.session.user) {
+    if (req.session && req.session.user) {
         return next();
+    }
+    // Return JSON for API requests, redirect for views
+    const isApi = req.originalUrl && req.originalUrl.startsWith('/api');
+    if (isApi) {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
     res.redirect('/login');
 };

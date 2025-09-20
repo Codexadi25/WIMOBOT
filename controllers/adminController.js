@@ -8,8 +8,9 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 /**
- * Bulk upload Cands from JSON file, reseting existing data
+ * Bulk upload Cands from JSON file with options to append or replace
  * POST /api/admin/bulk-upload-cands
+ * Body: { mode: 'append' | 'replace' } (default: 'append')
  */
 exports.bulkUploadCands = asyncHandler(async (req, res) => {
   if (!req.file) {
@@ -30,12 +31,45 @@ exports.bulkUploadCands = asyncHandler(async (req, res) => {
     throw new Error('JSON must contain a "categories" array');
   }
 
-  await Category.deleteMany({});
-  await Category.insertMany(jsonData.categories);
+  const mode = req.body.mode || 'append'; // Default to append mode
+  let message = '';
 
-  broadcastUpdate({ message: 'Canned responses have been reset and updated from file.' });
+  if (mode === 'replace') {
+    // Replace mode: Delete all existing data and insert new data
+    await Category.deleteMany({});
+    await Category.insertMany(jsonData.categories);
+    message = 'Canned responses have been replaced with new data from file.';
+  } else {
+    // Append mode: Add new data without deleting existing data
+    const existingCount = await Category.countDocuments();
+    const newCount = jsonData.categories.length;
+    
+    // Insert new categories, ignoring duplicates based on title
+    const insertedCategories = [];
+    for (const category of jsonData.categories) {
+      try {
+        const newCategory = await Category.create(category);
+        insertedCategories.push(newCategory);
+      } catch (error) {
+        // If category already exists (duplicate title), skip it
+        if (error.code === 11000) {
+          console.log(`Skipping duplicate category: ${category.title}`);
+        } else {
+          throw error;
+        }
+      }
+    }
+    
+    message = `Appended ${insertedCategories.length} new canned responses. ${existingCount} existing responses preserved.`;
+  }
 
-  res.status(200).json({ message: 'Database initialized successfully from JSON file.' });
+  broadcastUpdate({ message });
+
+  res.status(200).json({ 
+    message: 'Bulk upload completed successfully.',
+    details: message,
+    mode: mode
+  });
 });
 
 /**

@@ -918,7 +918,52 @@ function showToast(message, type = 'success') {
         }
     });
 
+    // --- Notifications: Mark as Read handler (fixes "Unable to identify user" and bell not hiding)
+    // Delegated listener so it works for dynamic content. Ensures session cookie is sent and UI updates.
+    document.body.addEventListener('click', async (ev) => {
+        const btn = ev.target.closest('.mark-read-btn');
+        if (!btn) return;
+
+        ev.preventDefault();
+        const notifId = btn.dataset.notificationId || 'all';
+
+        try {
+            const resp = await fetch('/api/notifications/mark-read', {
+                method: 'POST',
+                credentials: 'same-origin', // include session cookie so server can identify user
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: notifId })
+            });
+
+            const payload = await resp.json().catch(()=>({}));
+
+            if (!resp.ok) {
+                // surface server message if present
+                throw new Error(payload.message || `Request failed (${resp.status})`);
+            }
+
+            // Remove visual notification indicators
+            // remove numeric badges
+            document.querySelectorAll('.notification-count').forEach(n => n.remove());
+            // hide bell(s)
+            document.querySelectorAll('.notification-bell').forEach(b => {
+                b.style.display = 'none';
+                b.classList.add('hidden');
+            });
+
+            // Optionally update any UI counters
+            const notifCounter = document.querySelector('#unread-count');
+            if (notifCounter) notifCounter.textContent = '0';
+
+            showToast(payload.message || 'Marked as read', 'success');
+        } catch (err) {
+            console.error('Mark-as-read error:', err);
+            showToast(err.message || 'Unable to identify user. Please refresh the page.', 'error');
+        }
+    });
+
 });
+
 
 // --- Toast Notification Function ---
 function showToast(message, type = 'success') {

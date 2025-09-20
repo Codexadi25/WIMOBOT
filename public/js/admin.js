@@ -43,12 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
     bulkUploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fileInput = document.getElementById('jsonFile');
+      const modeSelect = document.getElementById('upload-mode');
       if (!fileInput || !fileInput.files || !fileInput.files[0]) return showToast('Select a JSON file', 'error');
       const fd = new FormData();
       fd.append('jsonFile', fileInput.files[0]);
+      fd.append('mode', modeSelect.value);
       try {
-        await api('/api/admin/bulk-upload-cands', 'POST', fd, true);
-        showToast('Cands uploaded, refreshing...', 'success');
+        const result = await api('/api/admin/bulk-upload-cands', 'POST', fd, true);
+        showToast(result.details || 'Cands uploaded, refreshing...', 'success');
         setTimeout(()=> location.reload(), 900);
       } catch (err) { showToast(err.message, 'error'); }
     });
@@ -102,6 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
       await api('/api/admin/cleanup-logs', 'POST', { days: 30, limit: 500 });
       showToast('Logs cleaned', 'success');
       document.getElementById('log-list').innerHTML = '<p>Logs cleaned.</p>';
+    } catch (err) { showToast(err.message,'error'); }
+  });
+
+  // Message cleanup
+  const cleanupMessagesBtn = document.getElementById('cleanupMessagesBtn');
+  if (cleanupMessagesBtn) cleanupMessagesBtn.addEventListener('click', async () => {
+    if (!confirm('This will delete all expired messages. Continue?')) return;
+    try {
+      const result = await api('/api/messages/cleanup', 'POST');
+      showToast(`Message cleanup completed. ${result.message}`, 'success');
     } catch (err) { showToast(err.message,'error'); }
   });
 

@@ -54,6 +54,9 @@ app.use('/', authRouter);
 app.use('/', require('./routes/viewRoutes'));
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/api/cands', require('./routes/api/candRoutes'));
+app.use('/api/pns', require('./routes/api/pnRoutes'));
+app.use('/api/feedback', require('./routes/api/feedbackRoutes'));
+app.use('/api/messages', require('./routes/api/messageRoutes'));
 const adminRouter = require('./routes/admin');
 const apiUsersRouter = require('./routes/users'); // for legacy /api/users/bulk route
 app.use('/api/admin', adminRouter);
