@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="feedback-date">${new Date(item.createdAt).toLocaleDateString()}</div>
                 </div>
                 <div class="feedback-title">${escapeHtml(item.title)}</div>
-                <pre class="feedback-description">${escapeHtml(item.description)}</pre>
+                <div class="feedback-description">${escapeHtml(item.description)}</div>
                 ${item.tags && item.tags.length > 0 ? `
                     <div class="feedback-tags">
                         ${item.tags.map(tag => `<span class="feedback-tag">${escapeHtml(tag)}</span>`).join('')}
